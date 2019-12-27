@@ -1,11 +1,11 @@
 FROM ubuntu:bionic
 
+LABEL maintainer="chris.bensch@gmail.com"
+
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV JAVA_HOME /opt/jdk1.8.0_201
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
 ENV PATH /opt/autopsy/bin:${JAVA_HOME}/bin:$PATH
-
-COPY --from=bannsec/autopwn-stage-j8 /tmp/jdk* /opt/.
 
 RUN apt-get update && apt-get install -y \
         apt-utils \
@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y \
         libvhdi-dev \
         libvmdk1 \
         libvmdk-dev \
+        openjdk-8-jdk \
         openjfx \
         testdisk \
         unzip \
@@ -38,6 +39,7 @@ RUN apt-get update && apt-get install -y \
         xorg-sgml-doctools \
         xtrans-dev \
     && rm -rf /var/lib/apt/lists/*
+
 RUN RELEASE_PATH=`curl -sL https://github.com/sleuthkit/autopsy/releases/latest \
         | grep -Eo 'href=".*.zip' \
         | grep -v archive \
@@ -58,12 +60,7 @@ RUN RELEASE_PATH=`curl -sL https://github.com/sleuthkit/autopsy/releases/latest 
     && curl -L https://github.com/${RELEASE_PATH} > tsk_java.deb \
     && dpkg -i tsk_java.deb \
         || apt-get install -fy \
-    && cd /opt \
-    && unzip -P AcceptEULA jdk*.zip \
-    && rm jdk*.zip \
     && cd /opt/autopsy*/ \
     && sh ./unix_setup.sh
-
-# cd /opt && curl -L -H 'Cookie: oraclelicense=accept-securebackup-cookie' https://download.oracle.com/otn-pub/java/jdk/8u201-b09/42970487e3af4f5aa5bca3f542482c60/jdk-8u201-linux-x64.tar.gz > jdk.tar.gz && tar xf jdk.tar.gz && rm jdk.tar.gz && cd jdk* && \
 
 ENTRYPOINT ["autopsy"]
