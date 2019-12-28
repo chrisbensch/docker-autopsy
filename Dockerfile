@@ -1,6 +1,7 @@
 FROM ubuntu:bionic
 
 LABEL maintainer="chris.bensch@gmail.com"
+# Forked from Bannsec
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -60,6 +61,9 @@ RUN RELEASE_PATH=`curl -sL https://github.com/sleuthkit/autopsy/releases/latest 
     && curl -L https://github.com/${RELEASE_PATH} > tsk_java.deb \
     && dpkg -i tsk_java.deb \
         || apt-get install -fy \
+    && rm tsk_java.deb \
+    && apt -y autoremove \
+    && apt autoclean \
     && cd /opt/autopsy*/ \
     && sh ./unix_setup.sh
 
